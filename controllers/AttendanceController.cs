@@ -60,4 +60,6 @@ public class AttendanceController : ControllerBase
 
         return Ok($"Attendance met ID {id} is succesvol verwijderd.");
     }
+
+    
 }

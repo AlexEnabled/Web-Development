@@ -88,4 +88,31 @@ public class EventAttendanceController : ControllerBase
 
         return Ok($"EventAttendance met ID {id} is succesvol verwijderd");
     }
+
+    [HttpPost("attend")]
+    public async Task<IActionResult> AttendEvent([FromBody] EventAttendance attendance)
+    {
+        try 
+        {
+            attendance.Id = Guid.NewGuid();
+            var result = await _eventattendanceService.RegisterEventAttendance(attendance);
+            
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+        
+            return Ok(new { 
+                message = "Successfully registered for the event",
+                eventAttendance = attendance 
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { 
+                message = "Error registering for event", 
+                details = ex.Message 
+            });
+        }
+    }
 }

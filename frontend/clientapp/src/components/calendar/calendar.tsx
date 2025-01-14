@@ -133,6 +133,37 @@ const Calendar = () => {
     fetchEvents();
   }, [currentDate, navigate]);
 
+  const handleAttendEvent = async (eventId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+
+      const response = await fetch('http://localhost:5001/api/eventattendance/create', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userID: userId,
+          eventID: eventId,
+          rating: 0,
+          feedback: ''
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to attend event');
+      }
+
+      alert('Successfully registered for the event!');
+    } catch (error) {
+      console.error('Event Attendance Error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to attend event');
+    }
+  };
+
   const getWeekDates = (date: Date) => {
     const week = [];
     const start = new Date(date);
@@ -388,7 +419,7 @@ const Calendar = () => {
                   key={event.id}
                   className={`${getEventColor(event)} p-3 rounded-lg`}
                 >
-                  <div className="font-semibold text-lg">{event.title}</div>
+                   <div className="font-semibold text-lg">{event.title}</div>
                   <div className="text-sm text-gray-700">
                     {formatTime(event.startTime)} - {formatTime(event.endTime)}
                   </div>
@@ -399,6 +430,12 @@ const Calendar = () => {
                   <div className="text-sm mt-1">
                     Status: {event.approval ? 'Approved' : 'Pending Approval'}
                   </div>
+                  <Button 
+                    onClick={() => handleAttendEvent(event.id)}
+                    className="mt-2"
+                  >
+                    Attend Event
+                  </Button>
                 </div>
               ))
             )}
@@ -409,4 +446,4 @@ const Calendar = () => {
   );
 };
 
-export default Calendar;
+export default Calendar; 
